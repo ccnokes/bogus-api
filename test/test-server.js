@@ -3,7 +3,9 @@
  * TODO add tests here with superagent or something
  */
 
+var bogusAPI = require('../index');
+
 //start it like so
-require('../index').start({
+bogusAPI.start({
     resourceDir: './sample-resources'
 });

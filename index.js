@@ -3,7 +3,8 @@ var chalk = require('chalk'),
     express = require('express'),
     jsonServer = require('json-server'),
     serveIndex = require('serve-index'),
-    requireDirectory = require('require-directory');
+    requireDirectory = require('require-directory'),
+    server = jsonServer.create(); // express server instance
 
 
 function merge(src, target) {
@@ -22,6 +23,8 @@ function printRoutes(resources, opts) {
 }
 
 
+exports.server = server;
+
 exports.start = function(options) {
     //set up the options
     var opts = merge({
@@ -33,8 +36,7 @@ exports.start = function(options) {
     opts.url = `http://${opts.host}:${opts.port}`;
     opts.resourceBaseUrl = `http://${opts.host}:${opts.port}/${opts.resourceUriPrefix}`;
 
-    var server = jsonServer.create(), // express server instance
-        isServingStatic = !!(opts.staticDir && opts.staticUri),
+    var isServingStatic = !!(opts.staticDir && opts.staticUri),
         resources = requireDirectory(module, opts.resourceDir);
 
     // serve static files if passed in
@@ -62,7 +64,6 @@ exports.start = function(options) {
 
     // return public API
     return {
-        expressServer: server,
         jsonServer: jsonServer,
         get resources() { return resources; }
     };
