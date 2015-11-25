@@ -1,6 +1,6 @@
 # Bogus API
 
-A wrapper around the great (json-server)[https://github.com/typicode/json-server]. It allows you to specify multiple "database" or REST resources. Pass in a directory of Javascript files to be required, and they become your REST endpoints.
+A wrapper around the great [json-server](https://github.com/typicode/json-server). It allows you to specify multiple REST resources. Pass in a directory of Javascript files to be required, and they become your REST endpoints.
 
 ### Install
 ```
@@ -25,7 +25,7 @@ for (var i = 0; i < 10; i++) {
 module.exports = users;
 ```
 
-Or could look like:
+Or it could look like:
 ```javascript
 module.exports = [
     { "id": 1, "title": "json-server", "author": "typicode" },
