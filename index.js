@@ -4,6 +4,7 @@ var chalk = require('chalk'),
     jsonServer = require('json-server'),
     serveIndex = require('serve-index'),
     requireDirectory = require('require-directory'),
+    _ = require('lodash'),
     server = jsonServer.create(); // express server instance
 
 
@@ -25,13 +26,14 @@ function printRoutes(resources, opts) {
 
 exports.server = server;
 
-exports.start = function(options) {
+exports.create = function(options) {
     //set up the options
     var opts = merge({
         port: 7000,
         host: '0.0.0.0',
         resourceUriPrefix: '',
-        resourceDir: './sample-resources'
+        resourceDir: './sample-resources',
+        proxy: {}
     }, options);
     opts.url = `http://${opts.host}:${opts.port}`;
     opts.resourceBaseUrl = `http://${opts.host}:${opts.port}/${opts.resourceUriPrefix}`;
@@ -51,20 +53,30 @@ exports.start = function(options) {
     // mount all resources as routes
     server.use(opts.resourceUriPrefix, jsonServer.router(resources));
 
-    // start the server
-    server.listen(opts.port, opts.host, () => {
-        print('blue', '--------------------------------------------------------------');
-        print('blue', `Mock API server started at ${opts.url}`);
-        printRoutes(resources, opts);
-        if(isServingStatic) {
-            print('blue', 'Serving static content from ' + opts.staticUri);
-        }
-        print('blue', '--------------------------------------------------------------');
-    });
+    // if a proxy is specified, add middleware to proxy requests
+    if(opts.proxy.host) {
+        var proxyMiddleware = require('./proxy-middleware');
+        server.use(proxyMiddleware({
+            host: opts.proxy.host,
+            port: opts.proxy.port || 80
+        }));
+    }
 
     // return public API
     return {
         jsonServer: jsonServer,
-        get resources() { return resources; }
+        get resources() { return resources; },
+        start() {
+            // start the server
+            server.listen(opts.port, opts.host, () => {
+                print('blue', '--------------------------------------------------------------');
+                print('blue', `Mock API server started at ${opts.url}`);
+                printRoutes(resources, opts);
+                if(isServingStatic) {
+                    print('blue', 'Serving static content from ' + opts.staticUri);
+                }
+                print('blue', '--------------------------------------------------------------');
+            });
+        }
     };
 };

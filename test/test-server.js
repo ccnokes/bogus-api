@@ -5,7 +5,9 @@
 
 var bogusAPI = require('../index');
 
-//start it like so
-bogusAPI.start({
-    resourceDir: './sample-resources'
-});
+bogusAPI.create({
+    proxy: {
+        host: 'localhost',
+        port: 7100
+    }
+}).start();

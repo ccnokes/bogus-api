@@ -1,38 +1,39 @@
 {
-    "name": "bogus-api",
-    "version": "1.0.0",
-    "description": "Mock API server for front-end development",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git"
-    },
-    "keywords": [
-        "JSON",
-        "server",
-        "fake",
-        "REST",
-        "API",
-        "prototyping",
-        "mock",
-        "mocking",
-        "test",
-        "testing",
-        "rest"
-    ],
-    "author": "Cameron Nokes",
-    "license": "ISC",
-    "engines": {
-        "node": ">= 4.0.0"
-    },
-    "dependencies": {
-        "chalk": "1.1.1",
-        "express": "4.13.3",
-        "json-server": "0.8.2",
-        "require-directory": "2.1.1",
-        "serve-index": "1.7.2"
-    },
-    "devDependencies": {}
+  "name": "bogus-api",
+  "version": "1.0.0",
+  "description": "Mock API server for front-end development",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "keywords": [
+    "JSON",
+    "server",
+    "fake",
+    "REST",
+    "API",
+    "prototyping",
+    "mock",
+    "mocking",
+    "test",
+    "testing",
+    "rest"
+  ],
+  "author": "Cameron Nokes",
+  "license": "ISC",
+  "engines": {
+    "node": ">= 4.0.0"
+  },
+  "dependencies": {
+    "chalk": "1.1.1",
+    "express": "4.13.3",
+    "http-proxy": "1.12.0",
+    "json-server": "0.8.2",
+    "require-directory": "2.1.1",
+    "serve-index": "1.7.2"
+  },
+  "devDependencies": {}
 }
