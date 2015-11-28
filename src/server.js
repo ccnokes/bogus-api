@@ -1,5 +1,6 @@
 
-var chalk = require('chalk'),
+var url = require('url'),
+    chalk = require('chalk'),
     express = require('express'),
     jsonServer = require('json-server'),
     serveIndex = require('serve-index'),
@@ -19,7 +20,7 @@ function print(color, val) {
 function printRoutes(resources, opts) {
     print('gray', 'Routes:');
     Object.keys(resources)
-        .map(item => opts.resourceBaseUrl + item)
+        .map(item => url.resolve(opts.resourceBaseUrl, '/' + item))
         .forEach(route => print('gray', route));
 }
 
@@ -29,7 +30,7 @@ exports.server = server;
 exports.create = function(options) {
     //set up the options
     var opts = merge({
-        port: 7000,
+        port: 7001,
         host: '0.0.0.0',
         resourceUriPrefix: '',
         resourceDir: './sample-resources',
@@ -50,6 +51,11 @@ exports.create = function(options) {
     // set default middlewares (logger, static, cors and no-cache)
     server.use(jsonServer.defaults());
 
+    // if routes fn defined, use it
+    if(opts.priorityRoutes) {
+        opts.priorityRoutes(server);
+    }
+
     // mount all resources as routes
     server.use(opts.resourceUriPrefix, jsonServer.router(resources));
 
@@ -65,7 +71,10 @@ exports.create = function(options) {
     // return public API
     return {
         jsonServer: jsonServer,
-        get resources() { return resources; },
+        server: server,
+        get resources() {
+            return resources;
+        },
         start() {
             // start the server
             server.listen(opts.port, opts.host, () => {

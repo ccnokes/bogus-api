@@ -8,10 +8,10 @@ const PROXY_PORT = 7100;
 
 // start test proxy server
 var testProxy = express();
-testProxy.get('/users', function(req, res){
+testProxy.get('/api/users', function(req, res){
     res.status(200).send({ message: 'this should not work' });
 });
-testProxy.get('/pokemon', function(req, res){
+testProxy.get('/api/pokemon', function(req, res){
     res.status(200).send({ message: 'pika pika' });
 });
 testProxy.listen(PROXY_PORT)
@@ -21,9 +21,15 @@ testProxy.listen(PROXY_PORT)
 var bogusServer = bogusAPI.create({
     staticDir: '.',
     staticUri: '/static',
+    resourceUriPrefix: '/api',
     proxy: {
         host: 'localhost',
         port: PROXY_PORT
+    },
+    priorityRoutes(server) {
+        server.get('/api/randomNumbers', function(req, res) {
+            res.status(500).send({ message: 'Some error.' });
+        });
     }
 }).start();
 
@@ -34,8 +40,8 @@ test('bogusServer sample resources should be GET-able ', t => {
 
     var postsResource = require('../src/sample-resources/posts');
 
-    request('localhost:7000')
-        .get('/posts')
+    request('localhost:7001')
+        .get('/api/posts')
         .expect('Content-Type', /json/)
         .expect(200)
         .end((err, res) => {
@@ -50,8 +56,8 @@ test('bogusServer sample resources should be GET-able ', t => {
 test('bogusServer should work with a fallback proxy', t => {
     t.plan(1);
 
-    request('localhost:7000')
-        .get('/pokemon')
+    request('localhost:7001')
+        .get('/api/pokemon')
         .expect('Content-Type', /json/)
         .expect(200)
         .end((err, res) => {
@@ -68,8 +74,8 @@ test('bogusServer should serve it\'s resource first, even if it exists in the pr
 
     var usersResource = require('../src/sample-resources/users');
 
-    request('localhost:7000')
-        .get('/users')
+    request('localhost:7001')
+        .get('/api/users')
         .expect('Content-Type', /json/)
         .expect(200)
         .end((err, res) => {
@@ -84,8 +90,8 @@ test('bogusServer should serve it\'s resource first, even if it exists in the pr
 test('bogusServer should 404 if no resource exists', t => {
     t.plan(1);
 
-    request('localhost:7000')
-        .get('/noexist')
+    request('localhost:7001')
+        .get('/api/noexist')
         .expect(404)
         .end((err, res) => {
             if (err) {
@@ -101,7 +107,7 @@ test('bogusServer should 404 if no resource exists', t => {
 test('bogusServer should serve static content index', t => {
     t.plan(1);
 
-    request('localhost:7000')
+    request('localhost:7001')
         .get('/static')
         .expect(200)
         .expect('Content-Type', /html/)
@@ -119,7 +125,7 @@ test('bogusServer should serve static content index', t => {
 test('bogusServer should serve static content', t => {
     t.plan(1);
 
-    request('localhost:7000')
+    request('localhost:7001')
         .get('/static/package.json')
         .expect(200)
         .expect('Content-Type', /json/) //json because that's the file type we're requesting
@@ -128,6 +134,21 @@ test('bogusServer should serve static content', t => {
                 t.fail('HTTP status or Content-Type is incorrect');
             }
             t.deepEqual(res.body, require('../package.json'), 'serving static content as expected');
+            t.end();
+        });
+});
+
+test('bogusServer should should be capable of being "short-circuited" with a different response', t => {
+    request('localhost:7001')
+        .get('/api/randomNumbers')
+        .expect('Content-Type', /json/)
+        .expect(500)
+        .end((err, res) => {
+            console.log(res.body);
+            if (err) {
+                t.fail('Content-Type or HTTP status is incorrect');
+            }
+            t.deepEqual(res.body, { message: 'Some error.' }, 'short-circuited as expected');
             t.end();
         });
 });

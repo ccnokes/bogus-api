@@ -37,8 +37,27 @@ So you get a little more flexibility than with plain `json-server`.
 
 You can add or override routes using the Express API like so:
 ```javascript
-var bogusAPI = require('bogus-api');
-bogusAPI.server.get('/posts', function(req, res) {
-    res.status(500).send({ message: 'Some error.' });
-});
+bogusAPI = require('bogus-api');
+var bogusServer = bogusAPI.create({
+    // These routes will get mounted before the resources are, allowing you to "short-circuit" them
+    // This is useful for testing how the UI reacts to error states from an API
+    priorityRoutes: function(server) {
+        // the server arg is an instance of an Express server
+        server.get('/someRoute', function(req, res) {
+            res.status(500).send({ message: 'Some error.' });
+        });
+    }
+}).start();
 ```
+
+## Options
+
+| Option            | Description  |
+| ----------------- |--------------|
+| port              | Port the app runs on. 7001 by default. |
+| host              | 0.0.0.0 by default. |
+| resourceUriPrefix | Prefixes all resources with a URI. |
+| resourceDir       | Directory containing your resources. Default to sample-resources. |
+| proxy             | Object containing the host and port of the URL to proxy to. No default. |
+| staticDir         | Path to static directory to serve. |
+| staticUri         | URI to serve static directory through.  |
