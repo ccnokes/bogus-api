@@ -9,10 +9,10 @@ npm install bogus-api
 
 ### Usage
 ```javascript
-require('bogus-api').create().start({
+require('bogus-api').create({
     resourceDir: './my-resources',
     resourceUriPrefix: '/api/v1',
-});
+}).start();
 ```
 
 Each JS file in the `my-resources` directory could look like:
